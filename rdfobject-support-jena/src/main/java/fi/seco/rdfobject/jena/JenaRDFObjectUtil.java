@@ -8,6 +8,7 @@ import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.rdf.model.AnonId;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -83,4 +84,26 @@ public class JenaRDFObjectUtil {
 			return new BNodeResourceRDFObject(object.getBlankNodeLabel());
 		else return new URIResourceRDFObject(object.getURI());
 	}
+
+	public static IRDFObject getRDFObjectForRDFNode(RDFNode object) {
+		if (object.isLiteral()) {
+			Literal l = object.asLiteral();
+			return new LiteralRDFObject(l.getLexicalForm(), !"".equals(l.getLanguage()) ? LocaleUtil.parseLocaleString(l.getLanguage()) : null, l.getDatatypeURI());
+		} else if (object.isAnon())
+			return new BNodeResourceRDFObject(object.asResource().getId().getLabelString());
+		else return new URIResourceRDFObject(object.asResource().getURI());
+	}
+
+	public static ITriple getTripleForJenaTriple(Triple t) {
+		return new fi.seco.rdfobject.Triple(getRDFObjectForNode(t.getSubject()), getRDFObjectForNode(t.getPredicate()), getRDFObjectForNode(t.getObject()));
+	}
+
+	public static ITriple getTripleForJenaStatement(Statement s) {
+		return new fi.seco.rdfobject.Triple(getRDFObjectForRDFNode(s.getSubject()), getRDFObjectForRDFNode(s.getPredicate()), getRDFObjectForRDFNode(s.getObject()));
+	}
+
+	public static IQuad getQuadForJenaQuad(Quad q) {
+		return new fi.seco.rdfobject.Quad(getRDFObjectForNode(q.getSubject()), getRDFObjectForNode(q.getPredicate()), getRDFObjectForNode(q.getObject()), getRDFObjectForNode(q.getGraph()));
+	}
+
 }
