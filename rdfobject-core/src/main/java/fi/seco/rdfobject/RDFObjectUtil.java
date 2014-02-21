@@ -29,15 +29,15 @@ public class RDFObjectUtil {
 			int textEnd = lexicalForm.lastIndexOf('"');
 			String text = lexicalForm.substring(1, textEnd);
 			int langStart = lexicalForm.indexOf('@', textEnd);
-			int datatypeStart = lexicalForm.indexOf("^^", textEnd);
+			int datatypeStart = lexicalForm.indexOf("^^<", textEnd);
 			Locale lang;
 			if (langStart == -1)
 				lang = null;
-			else lang = datatypeStart != -1 ? LocaleUtil.parseLocaleString(lexicalForm.substring(langStart, datatypeStart)) : LocaleUtil.parseLocaleString(lexicalForm.substring(langStart));
+			else lang = datatypeStart != -1 ? LocaleUtil.parseLocaleString(lexicalForm.substring(langStart + 1, datatypeStart)) : LocaleUtil.parseLocaleString(lexicalForm.substring(langStart + 1));
 			String datatype;
 			if (datatypeStart == -1)
 				datatype = null;
-			else datatype = lexicalForm.substring(datatypeStart);
+			else datatype = lexicalForm.substring(datatypeStart + 3, lexicalForm.length() - 1);
 			return new LiteralRDFObject(text, lang, datatype);
 		}
 		if (lexicalForm.startsWith("<"))
